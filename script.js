@@ -6,6 +6,10 @@ var map = L.map('map', {
     scrollWheelZoom: true
 });
 
+var clusterLayer = L.markerClusterGroup();
+var dataLayer = L.geoJSON(data, { /* same options */ });
+clusterLayer.addLayer(dataLayer).addTo(map);
+
 // Add OpenStreetMap tiles (free, no API key)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
