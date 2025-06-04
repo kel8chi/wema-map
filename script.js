@@ -1,20 +1,19 @@
 // Initialize Leaflet map, centered on Nigeria
 var map = L.map('map', {
     center: [9.0820, 8.6753], // Center of Nigeria
-    zoom: 6, // Zoom level to show entire country
+    zoom: 6,
     zoomControl: true,
     scrollWheelZoom: true
 });
 
-var clusterLayer = L.markerClusterGroup();
-var dataLayer = L.geoJSON(data, { /* same options */ });
-clusterLayer.addLayer(dataLayer).addTo(map);
-
-// Add OpenStreetMap tiles (free, no API key)
+// Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19
 }).addTo(map);
+
+// Initialize cluster group
+var clusterLayer = L.markerClusterGroup();
 
 // Load GeoJSON data
 fetch('data/wema.json')
@@ -26,14 +25,14 @@ fetch('data/wema.json')
             event: { color: '#00ff00', radius: 10 },
             vendor: { color: '#0000ff', radius: 8 },
             service: { color: '#ff00ff', radius: 8 },
-            waste: { color: '#0000ff', radius: 8 },
-            trending: { color: '#0000ff', radius: 8 }
+            waste: { color: '#FF00FF', radius: 8 },
+            trending: { color: '#000000', radius: 8 }
         };
 
         // Add GeoJSON layer
         var dataLayer = L.geoJSON(data, {
             pointToLayer: function(feature, latlng) {
-                return L.circleMarker(latlng, {
+                return L.circleMarker([latlng.lat, latlng.lng], {
                     radius: styles[feature.properties.category].radius,
                     fillColor: styles[feature.properties.category].color,
                     color: '#000',
@@ -50,7 +49,11 @@ fetch('data/wema.json')
                     ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
                 `);
             }
-        }).addTo(map);
+        });
+
+        // Add dataLayer to clusterLayer and then to map
+        clusterLayer.addLayer(dataLayer);
+        map.addLayer(clusterLayer);
 
         // Fit map to data bounds
         map.fitBounds(dataLayer.getBounds());
@@ -58,20 +61,24 @@ fetch('data/wema.json')
         // Filter by category
         document.getElementById('categoryFilter').addEventListener('change', function(e) {
             const category = e.target.value;
-            dataLayer.clearLayers();
+            clusterLayer.clearLayers(); // Clear cluster layer
+            dataLayer.clearLayers(); // Clear data layer
             dataLayer.addData(data.features.filter(feature => 
                 category === 'all' || feature.properties.category === category
             ));
+            clusterLayer.addLayer(dataLayer); // Re-add to cluster
         });
 
         // Keyword search
         document.getElementById('search').addEventListener('input', function(e) {
             const keyword = e.target.value.toLowerCase();
+            clusterLayer.clearLayers();
             dataLayer.clearLayers();
             dataLayer.addData(data.features.filter(feature => 
                 feature.properties.title.toLowerCase().includes(keyword) ||
                 feature.properties.description.toLowerCase().includes(keyword)
             ));
+            clusterLayer.addLayer(dataLayer);
         });
 
         // Proximity analysis: Find vendors near events
@@ -81,8 +88,10 @@ fetch('data/wema.json')
             const radius = 50000; // 50 km in meters
 
             // Clear existing layers
+            clusterLayer.clearLayers();
             dataLayer.clearLayers();
             dataLayer.addData(data.features);
+            clusterLayer.addLayer(dataLayer);
 
             // Add proximity buffers
             eventFeatures.forEach(event => {

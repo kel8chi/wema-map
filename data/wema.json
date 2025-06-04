@@ -52,7 +52,7 @@
             },
             "geometry": {
                 "type": "Point",
-                "coordinates": [10.4648, 7.4180] 
+                "coordinates": [7.4180, 10.4648 ] 
             }
         },
         {
@@ -65,7 +65,7 @@
             },
             "geometry": {
                 "type": "Point",
-                "coordinates": [11.9519, 8.5402] 
+                "coordinates": [ 8.5402, 11.9519] 
             }
         },
         {
@@ -78,16 +78,43 @@
             },
             "geometry": {
                 "type": "Point",
-                "coordinates": [6.0000, 5.4664] 
+                "coordinates": [ 5.4664, 6.0000] 
             }
         },
         {
             "type": "Feature",
             "properties": {
                 "id": 7,
+                "category": "waste",
+                "title": "wasteKontrol Ltd",
+                "description": "waste disposal company in  Borno"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [ 13.1500, 11.8333] 
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 8,
+                "category": "trending",
+                "title": "toxic smoke and fog",
+                "description": "Burning illegal waste dump polluting the environ",
+                "link": "https://example.com/solar-report"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [4.2002, 12.4536] 
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 9,
                 "category": "service",
                 "title": "GreenConsult",
-                "description": "Environmental consulting in Ibadan"
+                "description": "Environmental consulting in Oyo"
             },
             "geometry": {
                 "type": "Point",
