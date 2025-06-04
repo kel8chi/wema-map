@@ -46,6 +46,45 @@
             "type": "Feature",
             "properties": {
                 "id": 4,
+                "category": "vendor",
+                "title": "Ecospoon Ltd",
+                "description": "Solar panel supplier in kaduna"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [10.4648, 7.4180] 
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 5,
+                "category": "vendor",
+                "title": "E-move Ltd",
+                "description": "EV supplier in Kano"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [11.9519, 8.5402] 
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 6,
+                "category": "service",
+                "title": "Ecosurance Ltd",
+                "description": "SDG consultancy in Delta"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [6.0000, 5.4664] 
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 7,
                 "category": "service",
                 "title": "GreenConsult",
                 "description": "Environmental consulting in Ibadan"
