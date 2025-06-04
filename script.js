@@ -25,7 +25,9 @@ fetch('data/wema.json')
             publication: { color: '#ff7800', radius: 8 },
             event: { color: '#00ff00', radius: 10 },
             vendor: { color: '#0000ff', radius: 8 },
-            service: { color: '#ff00ff', radius: 8 }
+            service: { color: '#ff00ff', radius: 8 },
+            waste: { color: '#0000ff', radius: 8 },
+            trending: { color: '#0000ff', radius: 8 }
         };
 
         // Add GeoJSON layer
