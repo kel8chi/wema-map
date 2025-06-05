@@ -1,19 +1,55 @@
-// Initialize Leaflet map, centered on Nigeria
+// Initialize Leaflet map
 var map = L.map('map', {
-    center: [9.0820, 8.6753], // Center of Nigeria
+    center: [9.0820, 8.6753], // Default center (Nigeria)
     zoom: 6,
     zoomControl: true,
     scrollWheelZoom: true
 });
 
-// Add OpenStreetMap tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// Define tile layers for light and dark themes
+var lightTheme = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19
-}).addTo(map);
+});
+
+var darkTheme = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & © <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 19
+});
+
+// Set default theme (light)
+var currentTileLayer = lightTheme;
+currentTileLayer.addTo(map);
 
 // Initialize cluster group
 var clusterLayer = L.markerClusterGroup();
+
+// Fetch user's location using ipapi.co
+function getUserLocation() {
+    fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error fetching IP location:', data.reason);
+                return;
+            }
+            const lat = data.latitude;
+            const lon = data.longitude;
+            // Center map on user's location
+            map.setView([lat, lon], 10);
+            // Add a marker for user's location
+            L.marker([lat, lon])
+                .addTo(map)
+                .bindPopup('Your Location')
+                .openPopup();
+        })
+        .catch(error => {
+            console.error('Error fetching user location:', error);
+        });
+}
+
+// Call getUserLocation when the map loads
+getUserLocation();
 
 // Load GeoJSON data
 fetch('data/wema.json')
@@ -61,12 +97,12 @@ fetch('data/wema.json')
         // Filter by category
         document.getElementById('categoryFilter').addEventListener('change', function(e) {
             const category = e.target.value;
-            clusterLayer.clearLayers(); // Clear cluster layer
-            dataLayer.clearLayers(); // Clear data layer
+            clusterLayer.clearLayers();
+            dataLayer.clearLayers();
             dataLayer.addData(data.features.filter(feature => 
                 category === 'all' || feature.properties.category === category
             ));
-            clusterLayer.addLayer(dataLayer); // Re-add to cluster
+            clusterLayer.addLayer(dataLayer);
         });
 
         // Keyword search
@@ -118,6 +154,26 @@ fetch('data/wema.json')
         });
     })
     .catch(error => console.error('Error loading GeoJSON:', error));
+
+// Theme toggle functionality
+document.getElementById('themeToggle').addEventListener('click', function() {
+    const isDark = document.body.classList.contains('dark-theme');
+    if (isDark) {
+        // Switch to light theme
+        map.removeLayer(currentTileLayer);
+        currentTileLayer = lightTheme;
+        currentTileLayer.addTo(map);
+        document.body.classList.remove('dark-theme');
+        document.getElementById('themeToggle').textContent = 'Switch to Dark Theme';
+    } else {
+        // Switch to dark theme
+        map.removeLayer(currentTileLayer);
+        currentTileLayer = darkTheme;
+        currentTileLayer.addTo(map);
+        document.body.classList.add('dark-theme');
+        document.getElementById('themeToggle').textContent = 'Switch to Light Theme';
+    }
+});
 
 // Optimize for mobile: Adjust zoom control position
 if (window.innerWidth <= 576) {

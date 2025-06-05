@@ -18,6 +18,28 @@ html, body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     max-width: 300px;
     width: 100%;
+    transition: background 0.3s, color 0.3s;
+}
+body.dark-theme .sidebar {
+    background: #2c2c2c;
+    color: #ffffff;
+}
+body.dark-theme .form-control,
+body.dark-theme .form-select {
+    background: #3a3a3a;
+    color: #ffffff;
+    border: 1px solid #555;
+}
+body.dark-theme .form-control::placeholder {
+    color: #ccc;
+}
+body.dark-theme .btn-success {
+    background: #28a745;
+    border-color: #28a745;
+}
+body.dark-theme .btn-secondary {
+    background: #555;
+    border-color: #555;
 }
 @media (max-width: 576px) {
     .sidebar {

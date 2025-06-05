@@ -98,6 +98,20 @@
             "type": "Feature",
             "properties": {
                 "id": 8,
+                "category": "waste",
+                "title": "local klean",
+                "description": "innovative Electric dump truck waste disposal startup in Plateau",
+                "link": "https://example.com/solar-report"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [8.8000, 9.7667] 
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 9,
                 "category": "trending",
                 "title": "toxic smoke and fog",
                 "description": "Burning illegal waste dump polluting the environ",
@@ -111,7 +125,21 @@
         {
             "type": "Feature",
             "properties": {
-                "id": 9,
+                "id": 10,
+                "category": "trending",
+                "title": "Petrol tanker on fire",
+                "description": "A road accident involving two petrol tankers causing uncontrollable fire",
+                "link": "https://example.com/solar-report"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [8.5167, 8.4917] 
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 11,
                 "category": "service",
                 "title": "GreenConsult",
                 "description": "Environmental consulting in Oyo"
