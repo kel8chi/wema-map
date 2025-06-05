@@ -33,9 +33,15 @@ body.dark-theme .form-select {
 body.dark-theme .form-control::placeholder {
     color: #ccc;
 }
-body.dark-theme .btn-success {
+body.dark-theme .btn-success,
+body.dark-theme .btn-primary,
+body.dark-theme .btn-secondary {
     background: #28a745;
     border-color: #28a745;
+}
+body.dark-theme .btn-primary {
+    background: #007bff;
+    border-color: #007bff;
 }
 body.dark-theme .btn-secondary {
     background: #555;

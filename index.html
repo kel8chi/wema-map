@@ -16,6 +16,11 @@
     <div class="sidebar p-3">
         <h4>Web Map 1</h4>
         <div class="mb-3">
+            <label for="aiQuery" class="form-label">Ask a Question:</label>
+            <input type="text" id="aiQuery" class="form-control" placeholder="e.g., Show vendors near Abuja">
+            <button id="aiQueryBtn" class="btn btn-primary mt-2">Search</button>
+        </div>
+        <div class="mb-3">
             <label for="categoryFilter" class="form-label">Filter by Category:</label>
             <select id="categoryFilter" class="form-select" aria-label="Filter by category">
                 <option value="all">All</option>
@@ -32,7 +37,6 @@
             <input type="text" id="search" class="form-control" placeholder="e.g., solar energy">
         </div>
         <button id="proximityBtn" class="btn btn-success">Find Vendors near Events</button>
-        <!-- Theme toggle button -->
         <button id="themeToggle" class="btn btn-secondary mt-3">Switch to Dark Theme</button>
     </div>
     <!-- Map container -->

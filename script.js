@@ -23,6 +23,103 @@ currentTileLayer.addTo(map);
 
 // Initialize cluster group
 var clusterLayer = L.markerClusterGroup();
+var dataLayer; // Global reference to GeoJSON layer
+var geojsonData; // Store GeoJSON data globally
+
+// Function to geocode location using Nominatim
+async function geocodeLocation(location) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
+    try {
+        const response = await fetch(url, { headers: { 'User-Agent': 'WebMap1/1.0' } });
+        const data = await response.json();
+        if (data.length > 0) {
+            return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error geocoding location:', error);
+        return null;
+    }
+}
+
+// Simple query parser (replace with Hugging Face NLP in production)
+function parseQuery(query) {
+    const lowerQuery = query.toLowerCase();
+    const categories = ['publication', 'event', 'vendor', 'service', 'waste', 'trending'];
+    let category = null;
+    let location = null;
+    let keyword = null;
+
+    // Detect category
+    for (const cat of categories) {
+        if (lowerQuery.includes(cat)) {
+            category = cat;
+            break;
+        }
+    }
+
+    // Detect location (simple regex for "near [place]")
+    const locationMatch = lowerQuery.match(/near\s+([a-z\s]+)/i);
+    if (locationMatch) {
+        location = locationMatch[1].trim();
+    }
+
+    // Detect keywords (remove category and location terms)
+    keyword = lowerQuery
+        .replace(/near\s+[a-z\s]+/i, '')
+        .replace(categories.join('|'), '')
+        .trim();
+
+    return { category, location, keyword };
+}
+
+// Filter GeoJSON data based on parsed query
+async function processAIQuery(query) {
+    const { category, location, keyword } = parseQuery(query);
+    clusterLayer.clearLayers();
+    dataLayer.clearLayers();
+
+    let filteredFeatures = geojsonData.features;
+
+    // Filter by category
+    if (category) {
+        filteredFeatures = filteredFeatures.filter(f => f.properties.category === category);
+    }
+
+    // Filter by keyword
+    if (keyword) {
+        filteredFeatures = filteredFeatures.filter(f =>
+            f.properties.title.toLowerCase().includes(keyword) ||
+            f.properties.description.toLowerCase().includes(keyword)
+        );
+    }
+
+    // Filter by location
+    if (location) {
+        const coords = await geocodeLocation(location);
+        if (coords) {
+            const radius = 50000; // 50km radius
+            const centerPoint = turf.point([coords.lon, coords.lat]);
+            const buffer = turf.buffer(centerPoint, radius / 1000, { units: 'kilometers' });
+
+            filteredFeatures = filteredFeatures.filter(f => {
+                const featurePoint = turf.point(f.geometry.coordinates);
+                return turf.booleanPointInPolygon(featurePoint, buffer);
+            });
+
+            // Center map on location
+            map.setView([coords.lat, coords.lon], 10);
+        }
+    }
+
+    // Update map
+    dataLayer.addData(filteredFeatures);
+    clusterLayer.addLayer(dataLayer);
+
+    // Display analytics
+    const resultCount = filteredFeatures.length;
+    alert(`Found ${resultCount} results for "${query}"`);
+}
 
 // Fetch user's location using ipapi.co
 function getUserLocation() {
@@ -35,17 +132,10 @@ function getUserLocation() {
             }
             const lat = data.latitude;
             const lon = data.longitude;
-            // Center map on user's location
             map.setView([lat, lon], 10);
-            // Add a marker for user's location
-            L.marker([lat, lon])
-                .addTo(map)
-                .bindPopup('Your Location')
-                .openPopup();
+            L.marker([lat, lon]).addTo(map).bindPopup('Your Location').openPopup();
         })
-        .catch(error => {
-            console.error('Error fetching user location:', error);
-        });
+        .catch(error => console.error('Error fetching user location:', error));
 }
 
 // Call getUserLocation when the map loads
@@ -55,6 +145,7 @@ getUserLocation();
 fetch('data/wema.json')
     .then(response => response.json())
     .then(data => {
+        geojsonData = data; // Store data globally
         // Layer styles by category
         const styles = {
             publication: { color: '#ff7800', radius: 8 },
@@ -66,7 +157,7 @@ fetch('data/wema.json')
         };
 
         // Add GeoJSON layer
-        var dataLayer = L.geoJSON(data, {
+        dataLayer = L.geoJSON(data, {
             pointToLayer: function(feature, latlng) {
                 return L.circleMarker([latlng.lat, latlng.lng], {
                     radius: styles[feature.properties.category].radius,
@@ -117,19 +208,25 @@ fetch('data/wema.json')
             clusterLayer.addLayer(dataLayer);
         });
 
+        // AI query search
+        document.getElementById('aiQueryBtn').addEventListener('click', function() {
+            const query = document.getElementById('aiQuery').value;
+            if (query) {
+                processAIQuery(query);
+            }
+        });
+
         // Proximity analysis: Find vendors near events
         document.getElementById('proximityBtn').addEventListener('click', function() {
             const eventFeatures = data.features.filter(f => f.properties.category === 'event');
             const vendorFeatures = data.features.filter(f => f.properties.category === 'vendor');
             const radius = 50000; // 50 km in meters
 
-            // Clear existing layers
             clusterLayer.clearLayers();
             dataLayer.clearLayers();
             dataLayer.addData(data.features);
             clusterLayer.addLayer(dataLayer);
 
-            // Add proximity buffers
             eventFeatures.forEach(event => {
                 const eventPoint = turf.point(event.geometry.coordinates);
                 const buffer = turf.buffer(eventPoint, radius / 1000, { units: 'kilometers' });
@@ -137,7 +234,6 @@ fetch('data/wema.json')
                     style: { color: '#ff0000', weight: 2, fillOpacity: 0.1 }
                 }).addTo(map);
 
-                // Highlight nearby vendors
                 vendorFeatures.forEach(vendor => {
                     const vendorPoint = turf.point(vendor.geometry.coordinates);
                     if (turf.booleanPointInPolygon(vendorPoint, buffer)) {
@@ -159,14 +255,12 @@ fetch('data/wema.json')
 document.getElementById('themeToggle').addEventListener('click', function() {
     const isDark = document.body.classList.contains('dark-theme');
     if (isDark) {
-        // Switch to light theme
         map.removeLayer(currentTileLayer);
         currentTileLayer = lightTheme;
         currentTileLayer.addTo(map);
         document.body.classList.remove('dark-theme');
         document.getElementById('themeToggle').textContent = 'Switch to Dark Theme';
     } else {
-        // Switch to dark theme
         map.removeLayer(currentTileLayer);
         currentTileLayer = darkTheme;
         currentTileLayer.addTo(map);
