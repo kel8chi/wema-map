@@ -1,13 +1,16 @@
+/* Unchanged except for minor tweaks for login form */
 html, body {
     margin: 0;
     padding: 0;
     height: 100vh;
     overflow: hidden;
 }
+
 #map {
     height: 100vh;
     width: 100%;
 }
+
 .sidebar {
     position: absolute;
     top: 10px;
@@ -16,44 +19,63 @@ html, body {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    max-width: 300px;
-    width: 100%;
-    transition: background 0.3s, color 0.3s;
+    max-width: 400px;
+    width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    padding: 10px;
 }
+
+.sidebar.collapsed {
+    height: 40px;
+    overflow: hidden;
+}
+
+body.dark-theme {
+    background: #1a1a1a;
+}
+
 body.dark-theme .sidebar {
     background: #2c2c2c;
     color: #ffffff;
 }
+
 body.dark-theme .form-control,
 body.dark-theme .form-select {
     background: #3a3a3a;
     color: #ffffff;
     border: 1px solid #555;
 }
+
 body.dark-theme .form-control::placeholder {
     color: #ccc;
 }
-body.dark-theme .btn-success,
+
 body.dark-theme .btn-primary,
 body.dark-theme .btn-secondary {
-    background: #28a745;
-    border-color: #28a745;
-}
-body.dark-theme .btn-primary {
     background: #007bff;
     border-color: #007bff;
 }
+
 body.dark-theme .btn-secondary {
     background: #555;
     border-color: #555;
 }
+
 @media (max-width: 576px) {
     .sidebar {
         width: 90%;
         left: 5%;
         top: 5px;
+        max-width: none;
+        min-width: 150px;
     }
     #map {
         height: calc(100vh - 60px);
     }
+}
+
+.toast-container {
+    z-index: 2000;
 }
