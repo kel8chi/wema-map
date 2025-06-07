@@ -1,81 +1,87 @@
-/* Unchanged except for minor tweaks for login form */
-html, body {
+/* Reset and base styles */
+body {
     margin: 0;
     padding: 0;
     height: 100vh;
     overflow: hidden;
+    transition: background-color 0.3s ease;
 }
 
-#map {
-    height: 100vh;
+.map-container {
     width: 100%;
+    height: 100%;
 }
 
+/* Sidebar styles */
 .sidebar {
-    position: absolute;
+    position: fixed;
     top: 10px;
     left: 10px;
     z-index: 1000;
-    background: white;
+    width: 250px;
+    max-width: 90vw;
+}
+
+.sidebar-content {
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    max-width: 400px;
-    width: 300px;
-    max-height: 80vh;
-    overflow-y: auto;
-    transition: all 0.3s ease;
-    padding: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.sidebar.collapsed {
-    height: 40px;
-    overflow: hidden;
+/* Legend styles */
+.legend li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
 }
 
-body.dark-theme {
-    background: #1a1a1a;
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
 }
 
-body.dark-theme .sidebar {
-    background: #2c2c2c;
-    color: #ffffff;
+/* Theme styles */
+.light-theme {
+    background: #f8f9fa;
 }
 
-body.dark-theme .form-control,
-body.dark-theme .form-select {
-    background: #3a3a3a;
-    color: #ffffff;
-    border: 1px solid #555;
+.dark-theme {
+    background: #212529;
 }
 
-body.dark-theme .form-control::placeholder {
-    color: #ccc;
+.dark-theme .sidebar-content {
+    background: rgba(33, 37, 41, 0.95);
+    color: #fff;
 }
 
-body.dark-theme .btn-primary,
-body.dark-theme .btn-secondary {
-    background: #007bff;
-    border-color: #007bff;
+.dark-theme .form-select {
+    background-color: #343a40;
+    color: #fff;
+    border-color: #495057;
 }
 
-body.dark-theme .btn-secondary {
-    background: #555;
-    border-color: #555;
+.dark-theme .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
 }
 
+/* Responsive design */
 @media (max-width: 576px) {
     .sidebar {
-        width: 90%;
-        left: 5%;
-        top: 5px;
-        max-width: none;
-        min-width: 150px;
+        width: 100%;
+        top: 0;
+        left: 0;
+        padding: 10px;
     }
-    #map {
-        height: calc(100vh - 60px);
+    #toggleSidebar {
+        width: 50px;
+        padding: 8px;
+        font-size: 0.9rem;
     }
-}
-
-.toast-container {
-    z-index: 2000;
 }
