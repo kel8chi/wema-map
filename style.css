@@ -1,10 +1,8 @@
-/* Reset and base styles */
 body {
     margin: 0;
     padding: 0;
     height: 100vh;
     overflow: hidden;
-    transition: background-color 0.3s ease;
 }
 
 .map-container {
@@ -12,7 +10,6 @@ body {
     height: 100%;
 }
 
-/* Sidebar styles */
 .sidebar {
     position: fixed;
     top: 10px;
@@ -27,10 +24,8 @@ body {
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Legend styles */
 .legend li {
     display: flex;
     align-items: center;
@@ -46,7 +41,6 @@ body {
     display: inline-block;
 }
 
-/* Theme styles */
 .light-theme {
     background: #f8f9fa;
 }
@@ -71,7 +65,6 @@ body {
     border-color: #0d6efd;
 }
 
-/* Responsive design */
 @media (max-width: 576px) {
     .sidebar {
         width: 100%;
@@ -80,12 +73,8 @@ body {
         padding: 10px;
     }
     #toggleSidebar {
-        width: 50px;
+        width: 60px;
         padding: 8px;
         font-size: 0.9rem;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 25201ee4891b69be92e5df3b1bb7edb249c74b74

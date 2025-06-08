@@ -148,6 +148,682 @@
         "type": "Point",
         "coordinates": [3.8964, 7.3878]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 12,
+        "category": "publication",
+        "title": "Wind Energy Potential",
+        "description": "Analysis of wind energy opportunities in Northern Nigeria.",
+        "link": "https://example.com/wind-report"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.4411, 11.0878]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 13,
+        "category": "event",
+        "title": "Eco Innovators Summit",
+        "description": "Gathering of green tech startups in Enugu.",
+        "date": "2025-07-15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.4985, 6.4413]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 14,
+        "category": "vendor",
+        "title": "GreenCycle Works",
+        "description": "Recycling equipment supplier in Ibadan."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.8964, 7.3878]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 15,
+        "category": "service",
+        "title": "EcoAudit Solutions",
+        "description": "Environmental compliance audits in Benin City."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.6275, 6.3340]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 16,
+        "category": "waste",
+        "title": "CleanCity Initiative",
+        "description": "Community-driven waste management program in Jos."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.8921, 9.9285]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 17,
+        "category": "trending",
+        "title": "Oil Spill Incident",
+        "description": "Major oil spill affecting coastal communities in Bayelsa.",
+        "link": "https://example.com/oil-spill"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.2649, 4.9247]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 18,
+        "category": "publication",
+        "title": "Climate Change Impact",
+        "description": "Study on climate effects on Nigerian agriculture.",
+        "link": "https://example.com/climate-report"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.6753, 9.0820]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 19,
+        "category": "event",
+        "title": "Renewable Energy Fair",
+        "description": "Showcasing solar and wind solutions in Calabar.",
+        "date": "2025-08-20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.3250, 4.9757]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 20,
+        "category": "vendor",
+        "title": "BioEnergy Corp",
+        "description": "Biogas systems provider in Akure."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.1950, 7.2571]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 21,
+        "category": "service",
+        "title": "GreenPath Consulting",
+        "description": "Sustainability planning for businesses in Abeokuta."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.3483, 7.1608]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 22,
+        "category": "waste",
+        "title": "RecycleNow Ltd",
+        "description": "Plastic recycling plant in Onitsha."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.7898, 6.1498]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 23,
+        "category": "trending",
+        "title": "Deforestation Alert",
+        "description": "Illegal logging reported in Cross River.",
+        "link": "https://example.com/deforestation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.6787, 5.8987]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 24,
+        "category": "publication",
+        "title": "Waste Management Guide",
+        "description": "Best practices for urban waste reduction.",
+        "link": "https://example.com/waste-guide"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.4064, 6.4654]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 25,
+        "category": "event",
+        "title": "Clean Energy Workshop",
+        "description": "Training on solar installation in Sokoto.",
+        "date": "2025-09-05"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.2432, 13.0627]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 26,
+        "category": "vendor",
+        "title": "EcoTech Supplies",
+        "description": "Supplier of energy-efficient appliances in Warri."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.7500, 5.5167]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 27,
+        "category": "service",
+        "title": "EcoMonitor Services",
+        "description": "Air quality monitoring in Aba."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.3667, 5.1167]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 28,
+        "category": "waste",
+        "title": "GreenDump Solutions",
+        "description": "Sanitary landfill management in Makurdi."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.5120, 7.7337]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 29,
+        "category": "trending",
+        "title": "Flooding Crisis",
+        "description": "Severe flooding impacting communities in Lokoja.",
+        "link": "https://example.com/flooding"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.7333, 7.8000]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 30,
+        "category": "publication",
+        "title": "Renewable Energy Policy",
+        "description": "Policy recommendations for Nigeria’s energy sector.",
+        "link": "https://example.com/energy-policy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.4951, 9.0579]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 31,
+        "category": "event",
+        "title": "Sustainability Forum",
+        "description": "Discussion on green policies in Owerri.",
+        "date": "2025-10-12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.0333, 5.4833]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 32,
+        "category": "vendor",
+        "title": "SolarWave Ltd",
+        "description": "Solar water heaters supplier in Ilorin."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.5421, 8.4966]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 33,
+        "category": "service",
+        "title": "EcoPlan Advisors",
+        "description": "Urban planning for sustainability in Uyo."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.9333, 5.0333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 34,
+        "category": "waste",
+        "title": "WasteAway Inc",
+        "description": "Organic waste composting in Minna."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.5574, 9.6050]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 35,
+        "category": "trending",
+        "title": "Air Pollution Spike",
+        "description": "Increased smog levels reported in Kano.",
+        "link": "https://example.com/air-pollution"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.5167, 12.0000]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 36,
+        "category": "publication",
+        "title": "Biodiversity Report",
+        "description": "Assessment of Nigeria’s ecosystems.",
+        "link": "https://example.com/biodiversity"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.3163, 4.9757]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 37,
+        "category": "event",
+        "title": "Green Youth Summit",
+        "description": "Youth-led environmental initiatives in Zaria.",
+        "date": "2025-11-01"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.6990, 11.0855]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 38,
+        "category": "vendor",
+        "title": "EcoLight Systems",
+        "description": "LED lighting solutions in Asaba."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.6959, 6.2059]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 39,
+        "category": "service",
+        "title": "CleanWater Solutions",
+        "description": "Water purification services in Gombe."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [11.1658, 10.2880]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 40,
+        "category": "waste",
+        "title": "EcoScrap Collectors",
+        "description": "Scrap metal recycling in Bauchi."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.8447, 10.3148]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 41,
+        "category": "trending",
+        "title": "Erosion Threat",
+        "description": "Severe soil erosion affecting farms in Anambra.",
+        "link": "https://example.com/erosion"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.0068, 6.2209]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 42,
+        "category": "publication",
+        "title": "Urban Greening Study",
+        "description": "Strategies for green spaces in cities.",
+        "link": "https://example.com/urban-greening"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.3792, 6.5244]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 43,
+        "category": "event",
+        "title": "EcoTech Hackathon",
+        "description": "Innovation challenge for sustainable tech in Port Harcourt.",
+        "date": "2025-12-10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.0068, 4.8146]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 44,
+        "category": "vendor",
+        "title": "GreenPower Ltd",
+        "description": "Off-grid solar systems in Yola."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [12.4493, 9.2565]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 45,
+        "category": "service",
+        "title": "EcoCertify",
+        "description": "Certification for eco-friendly businesses in Maiduguri."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [13.1600, 11.8469]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 46,
+        "category": "waste",
+        "title": "CleanStreets NG",
+        "description": "Street cleaning initiative in Ado-Ekiti."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.2215, 7.6152]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 47,
+        "category": "trending",
+        "title": "Chemical Leak",
+        "description": "Industrial chemical spill reported in Sapele.",
+        "link": "https://example.com/chemical-leak"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.6767, 5.8904]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 48,
+        "category": "publication",
+        "title": "Solar Adoption Trends",
+        "description": "Report on solar energy uptake in Nigeria.",
+        "link": "https://example.com/solar-trends"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.3775, 9.0579]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 49,
+        "category": "event",
+        "title": "Waste Reduction Rally",
+        "description": "Public campaign for waste reduction in Umuahia.",
+        "date": "2026-01-20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.4946, 5.5320]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 50,
+        "category": "vendor",
+        "title": "EcoBuild Materials",
+        "description": "Sustainable building materials supplier in Lafia."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.5150, 8.5200]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 51,
+        "category": "service",
+        "title": "GreenEnergy Audits",
+        "description": "Energy efficiency audits in Damaturu."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [11.9610, 11.7470]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 52,
+        "category": "waste",
+        "title": "BioClean NG",
+        "description": "Biomedical waste management in Jalingo."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [11.3600, 8.8929]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 53,
+        "category": "trending",
+        "title": "Wildlife Poaching",
+        "description": "Illegal wildlife poaching reported in Yankari.",
+        "link": "https://example.com/poaching"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.5000, 9.7500]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 54,
+        "category": "publication",
+        "title": "Eco-Farming Techniques",
+        "description": "Guide to sustainable farming practices.",
+        "link": "https://example.com/eco-farming"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.1000, 10.3167]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 55,
+        "category": "event",
+        "title": "Clean Rivers Campaign",
+        "description": "River cleanup initiative in Osogbo.",
+        "date": "2026-02-15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.5620, 7.7749]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 56,
+        "category": "vendor",
+        "title": "EcoCool Systems",
+        "description": "Eco-friendly cooling systems in Dutse."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.3500, 11.7050]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 57,
+        "category": "service",
+        "title": "EcoRestore",
+        "description": "Land restoration services in Gusau."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.6610, 12.1700]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 58,
+        "category": "waste",
+        "title": "GreenCycle NG",
+        "description": "E-waste recycling program in Birnin Kebbi."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.1975, 12.4539]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 59,
+        "category": "trending",
+        "title": "Desertification",
+        "description": "Advancing desertification affecting farms in Katsina.",
+        "link": "https://example.com/desertification"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.6223, 12.9816]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 60,
+        "category": "publication",
+        "title": "Green Infrastructure",
+        "description": "Report on sustainable urban infrastructure.",
+        "link": "https://example.com/green-infra"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.9470, 7.3775]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 61,
+        "category": "event",
+        "title": "EcoFest 2026",
+        "description": "Festival promoting eco-friendly living in Eket.",
+        "date": "2026-03-10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.9240, 4.6410]
+      }
     }
   ]
 }
