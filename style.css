@@ -54,7 +54,8 @@ body {
     color: #fff;
 }
 
-.dark-theme .form-select {
+.dark-theme .form-select,
+.dark-theme .btn-outline-secondary {
     background-color: #343a40;
     color: #fff;
     border-color: #495057;
@@ -63,6 +64,27 @@ body {
 .dark-theme .btn-primary {
     background-color: #0d6efd;
     border-color: #0d6efd;
+}
+
+.dark-theme .leaflet-control {
+    background: #343a40;
+    color: #fff;
+    border-color: #495057;
+}
+
+.dark-theme .leaflet-control a {
+    color: #fff;
+}
+
+.marker-cluster {
+    background-clip: padding-box;
+    border-radius: 50%;
+}
+
+.marker-cluster div {
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 @media (max-width: 576px) {
@@ -76,5 +98,8 @@ body {
         width: 60px;
         padding: 8px;
         font-size: 0.9rem;
+    }
+    .sidebar-content {
+        font-size: 0.85rem;
     }
 }

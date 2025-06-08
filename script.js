@@ -2,11 +2,22 @@ document.addEventListener('DOMContentLoaded', () => {
     class MapManager {
         constructor() {
             this.map = null;
-            this.dataLayer = null;
+            this.clusterGroup = null;
             this.geojsonData = { features: [] };
             this.selectedCategory = 'all';
             this.defaultCenter = [9.0820, 8.6753]; // Nigeria center
             this.defaultZoom = 6;
+            this.isDarkTheme = false;
+            this.tileLayers = {
+                light: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    maxZoom: 18,
+                }),
+                dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '© <a href="https://carto.com/attributions">CARTO</a>',
+                    maxZoom: 18,
+                })
+            };
 
             this.styles = {
                 publication: { color: '#ff7800', label: 'Publication' },
@@ -34,11 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 console.log('Number of features:', this.geojsonData.features.length);
 
-                this.dataLayer = L.geoJSON(this.geojsonData, {
+                // Initialize cluster group
+                this.clusterGroup = L.markerClusterGroup({
+                    maxClusterRadius: 50,
+                    iconCreateFunction: (cluster) => {
+                        return L.divIcon({
+                            html: `<div style="background-color: #007bff; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">${cluster.getChildCount()}</div>`,
+                            className: 'marker-cluster',
+                            iconSize: L.point(30, 30)
+                        });
+                    }
+                });
+
+                // Process GeoJSON
+                L.geoJSON(this.geojsonData, {
                     pointToLayer: (feature, latlng) => {
+                        // Swap coordinates: GeoJSON is [lng, lat], Leaflet needs [lat, lng]
+                        const coords = feature.geometry.coordinates;
+                        const correctedLatLng = [coords[1], coords[0]];
                         const category = feature.properties?.category || 'publication';
-                        console.log('Processing feature:', feature.properties?.title, 'Coordinates:', feature.geometry.coordinates);
-                        return L.circleMarker(latlng, {
+                        console.log('Processing feature:', feature.properties?.title, 'Corrected Coordinates:', correctedLatLng);
+                        const marker = L.circleMarker(correctedLatLng, {
                             radius: 8,
                             fillColor: this.styles[category]?.color || '#ff7800',
                             color: '#000',
@@ -46,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             opacity: 1,
                             fillOpacity: 0.8,
                         });
+                        return marker;
                     },
                     filter: (feature) => {
                         const coords = feature.geometry?.coordinates;
@@ -68,15 +96,19 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
                             `);
                             console.log('Added popup for:', feature.properties?.title);
+                            // Add marker to cluster group based on category
+                            if (this.selectedCategory === 'all' || this.selectedCategory === category) {
+                                this.clusterGroup.addLayer(layer);
+                            }
                         }
                     },
                 });
 
-                this.filterLayer();
-                this.dataLayer.addTo(this.map); // Ensure layer is added to the map
-                console.log('GeoJSON layer added to map');
+                // Add cluster group to map
+                this.clusterGroup.addTo(this.map);
+                console.log('GeoJSON layer added to map with clustering');
 
-                const bounds = this.dataLayer.getBounds();
+                const bounds = this.clusterGroup.getBounds();
                 if (bounds.isValid()) {
                     console.log('Fitting map to bounds:', bounds);
                     this.map.fitBounds(bounds);
@@ -103,11 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     center: this.defaultCenter,
                     zoom: this.defaultZoom,
                     zoomControl: true,
+                    layers: [this.tileLayers.light]
                 });
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                    maxZoom: 18,
-                }).addTo(this.map);
                 console.log('Map initialized successfully');
                 return true;
             } catch (error) {
@@ -144,18 +173,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
         filterLayer() {
             console.log('Filtering layer by category:', this.selectedCategory);
-            if (!this.dataLayer) {
-                console.warn('Data layer not initialized');
+            if (!this.clusterGroup) {
+                console.warn('Cluster group not initialized');
                 return;
             }
-            this.dataLayer.eachLayer(layer => {
-                const category = layer.feature.properties?.category || 'publication';
-                const isVisible = this.selectedCategory === 'all' || category === this.selectedCategory;
-                layer.setStyle({
-                    fillOpacity: isVisible ? 0.8 : 0,
-                    opacity: isVisible ? 1 : 0,
-                });
+            // Clear existing layers
+            this.clusterGroup.clearLayers();
+            // Re-add layers based on selected category
+            L.geoJSON(this.geojsonData, {
+                pointToLayer: (feature, latlng) => {
+                    const coords = feature.geometry.coordinates;
+                    const correctedLatLng = [coords[1], coords[0]];
+                    const category = feature.properties?.category || 'publication';
+                    const marker = L.circleMarker(correctedLatLng, {
+                        radius: 8,
+                        fillColor: this.styles[category]?.color || '#ff7800',
+                        color: '#000',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8,
+                    });
+                    return marker;
+                },
+                filter: (feature) => {
+                    const coords = feature.geometry?.coordinates;
+                    const isValid = coords?.length === 2 &&
+                                    !isNaN(coords[0]) &&
+                                    !isNaN(coords[1]);
+                    if (!isValid) return false;
+                    const category = feature.properties?.category || 'publication';
+                    return this.selectedCategory === 'all' || category === this.selectedCategory;
+                },
+                onEachFeature: (feature, layer) => {
+                    const category = feature.properties?.category || 'unknown';
+                    layer.bindPopup(`
+                        <strong>${feature.properties.title || 'Untitled'}</strong><br>
+                        ${feature.properties.description || 'No description'}<br>
+                        Category: ${this.styles[category]?.label || 'Unknown'}<br>
+                        ${feature.properties.link ? `<a href="${feature.properties.link}" target="_blank" rel="noopener">Link</a>` : ''}
+                        ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
+                    `);
+                    this.clusterGroup.addLayer(layer);
+                },
             });
+            this.clusterGroup.addTo(this.map);
+            console.log('Layer filtered and added to map');
+        }
+
+        toggleTheme() {
+            this.isDarkTheme = !this.isDarkTheme;
+            document.body.className = this.isDarkTheme ? 'dark-theme' : 'light-theme';
+            const themeButton = document.getElementById('themeToggle');
+            themeButton.innerHTML = `<i class="bi bi-${this.isDarkTheme ? 'sun-fill' : 'moon-stars-fill'}"></i> Toggle ${this.isDarkTheme ? 'Light' : 'Dark'} Theme`;
+            if (this.isDarkTheme) {
+                this.map.removeLayer(this.tileLayers.light);
+                this.tileLayers.dark.addTo(this.map);
+            } else {
+                this.map.removeLayer(this.tileLayers.dark);
+                this.tileLayers.light.addTo(this.map);
+            }
+            console.log('Theme toggled to:', this.isDarkTheme ? 'dark' : 'light');
         }
 
         initializeInteractions() {
@@ -163,11 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const toggleSidebar = document.getElementById('toggleSidebar');
             const sidebarContent = document.getElementById('sidebarContent');
             const categoryFilter = document.getElementById('categoryFilter');
-            const themeSelect = document.getElementById('themeSelect');
+            const themeToggle = document.getElementById('themeToggle');
 
-            if (!toggleSidebar || !sidebarContent || !categoryFilter || !themeSelect) {
+            if (!toggleSidebar || !sidebarContent || !categoryFilter || !themeToggle) {
                 this.showError('Failed to initialize controls.');
-                console.error('Missing DOM elements:', { toggleSidebar, sidebarContent, categoryFilter, themeSelect });
+                console.error('Missing DOM elements:', { toggleSidebar, sidebarContent, categoryFilter, themeToggle });
                 return;
             }
 
@@ -184,9 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.filterLayer();
             });
 
-            themeSelect.addEventListener('change', (e) => {
-                document.body.className = `${e.target.value}-theme`;
-                console.log('Theme changed to:', e.target.value);
+            themeToggle.addEventListener('click', () => {
+                this.toggleTheme();
             });
         }
 
