@@ -25,6 +25,16 @@
             <i class="bi bi-list"></i> Map Controls
         </button>
         <div class="sidebar-content collapse" id="sidebarContent">
+            <h5 class="mb-3">User Profile</h5>
+            <div class="mb-3">
+                <p><strong>Points:</strong> <span id="userPoints">0</span></p>
+                <p><strong>Badges:</strong> <span id="userBadges">None</span></p>
+                <button id="viewLeaderboard" class="btn btn-outline-primary w-100 mb-2">View Leaderboard</button>
+            </div>
+            <h5 class="mb-3">Daily Challenge</h5>
+            <p id="dailyChallenge" class="mb-3">Loading challenge...</p>
+            <h5 class="mb-3">Search Locations</h5>
+            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by title or description" aria-label="Search locations">
             <h5 class="mb-3">Filter by Category</h5>
             <select id="categoryFilter" class="form-select mb-3" aria-label="Filter by category">
                 <option value="all">All Categories</option>
@@ -35,6 +45,8 @@
                 <option value="waste">Waste</option>
                 <option value="trending">Trending</option>
             </select>
+            <h5 class="mb-3">Bookmarks</h5>
+            <ul id="bookmarkList" class="list-unstyled mb-3"></ul>
             <h5 class="mb-3">Theme</h5>
             <button id="themeToggle" class="btn btn-outline-secondary w-100 mb-3" aria-label="Toggle theme">
                 <i class="bi bi-moon-stars-fill"></i> Toggle Dark Theme
@@ -52,18 +64,35 @@
             <button id="toggleHeatmap" class="btn btn-outline-primary w-100 mb-2" aria-label="Toggle heatmap">
                 <i class="bi bi-fire"></i> Toggle Heatmap
             </button>
-            <h5 class="mb-3">Legend</h5>
-            <ul class="list-unstyled legend">
-                <li><span class="dot" style="background: #ff7800;"></span> Publication</li>
-                <li><span class="dot" style="background: #00ff00;"></span> Event</li>
-                <li><span class="dot" style="background: #0000ff;"></span> Vendor</li>
-                <li><span class="dot" style="background: #ff00ff;"></span> Service</li>
-                <li><span class="dot" style="background: #800080;"></span> Waste</li>
-                <li><span class="dot" style="background: #ff0000;"></span> Trending</li>
-            </\Support
+            <h5 class="mb-3">Interactive Legend</h5>
+            <ul class="list-unstyled legend" id="legend">
+                <li data-category="publication"><input type="checkbox" checked> <span class="dot" style="background: #ff7800;"></span> Publication</li>
+                <li data-category="event"><input type="checkbox" checked> <span class="dot" style="background: #00ff00;"></span> Event</li>
+                <li data-category="vendor"><input type="checkbox" checked> <span class="dot" style="background: #0000ff;"></span> Vendor</li>
+                <li data-category="service"><input type="checkbox" checked> <span class="dot" style="background: #ff00ff;"></span> Service</li>
+                <li data-category="waste"><input type="checkbox" checked> <span class="dot" style="background: #800080;"></span> Waste</li>
+                <li data-category="trending"><input type="checkbox" checked> <span class="dot" style="background: #ff0000;"></span> Trending</li>
+            </ul>
+            <h5 class="mb-3">Share</h5>
+            <button id="shareMap" class="btn btn-outline-primary w-100 mb-2" aria-label="Share map">
+                <i class="bi bi-share"></i> Share Map View
+            </button>
         </div>
     </div>
     <div id="errorMessage" class="alert alert-danger position-fixed top-0 end-0 m-2" style="display: none;" role="alert"></div>
+    <div id="leaderboardModal" class="modal fade" tabindex="-1" aria-labelledby="leaderboardModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="leaderboardModalLabel">Leaderboard</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="leaderboardList" class="list-unstyled"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
     <!-- Leaflet MarkerCluster JS -->

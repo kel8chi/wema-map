@@ -24,6 +24,8 @@ body {
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .legend li {
@@ -32,6 +34,7 @@ body {
     gap: 8px;
     font-size: 0.9rem;
     margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .dot {
@@ -39,6 +42,19 @@ body {
     height: 12px;
     border-radius: 50%;
     display: inline-block;
+}
+
+.bookmark-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.bookmark-link:hover {
+    text-decoration: underline;
+}
+
+.remove-bookmark {
+    margin-left: 10px;
 }
 
 .light-theme {
@@ -54,6 +70,7 @@ body {
     color: #fff;
 }
 
+.dark-theme .form-control,
 .dark-theme .form-select,
 .dark-theme .btn-outline-secondary,
 .dark-theme .btn-outline-primary {
@@ -67,7 +84,8 @@ body {
     border-color: #0d6efd;
 }
 
-.dark-theme .leaflet-control {
+.dark-theme .leaflet-control,
+.dark-theme .modal-content {
     background: #343a40;
     color: #fff;
     border-color: #495057;
