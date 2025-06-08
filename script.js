@@ -3,11 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
         constructor() {
             this.map = null;
             this.clusterGroup = null;
+            this.heatmapLayer = null;
+            this.drawLayer = null;
             this.geojsonData = { features: [] };
             this.selectedCategory = 'all';
             this.defaultCenter = [9.0820, 8.6753]; // Nigeria center
             this.defaultZoom = 6;
             this.isDarkTheme = false;
+            this.isHeatmapActive = false;
             this.tileLayers = {
                 light: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -57,10 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
+                // Initialize heatmap layer
+                this.heatmapLayer = L.heatLayer([], {
+                    radius: 25,
+                    blur: 15,
+                    maxZoom: 17,
+                });
+
                 // Process GeoJSON
                 L.geoJSON(this.geojsonData, {
                     pointToLayer: (feature, latlng) => {
-                        // Swap coordinates: GeoJSON is [lng, lat], Leaflet needs [lat, lng]
                         const coords = feature.geometry.coordinates;
                         const correctedLatLng = [coords[1], coords[0]];
                         const category = feature.properties?.category || 'publication';
@@ -96,10 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
                             `);
                             console.log('Added popup for:', feature.properties?.title);
-                            // Add marker to cluster group based on category
                             if (this.selectedCategory === 'all' || this.selectedCategory === category) {
                                 this.clusterGroup.addLayer(layer);
                             }
+                            // Store feature for spatial analysis
+                            layer.feature = feature;
                         }
                     },
                 });
@@ -116,6 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.warn('Invalid bounds, using default view');
                     this.map.setView(this.defaultCenter, this.defaultZoom);
                 }
+
+                // Update heatmap
+                this.updateHeatmap();
             } catch (error) {
                 this.showError('Failed to load map data. Check console for details.');
                 console.error('GeoJSON load error:', error);
@@ -138,12 +151,158 @@ document.addEventListener('DOMContentLoaded', () => {
                     layers: [this.tileLayers.light]
                 });
                 console.log('Map initialized successfully');
+
+                // Initialize draw layer
+                this.drawLayer = new L.FeatureGroup();
+                this.map.addLayer(this.drawLayer);
+
+                // Initialize draw control
+                const drawControl = new L.Control.Draw({
+                    edit: {
+                        featureGroup: this.drawLayer,
+                        remove: true
+                    },
+                    draw: {
+                        polygon: true,
+                        polyline: false,
+                        rectangle: false,
+                        circle: true,
+                        marker: true,
+                        circlemarker: false
+                    }
+                });
+                this.map.addControl(drawControl);
+
+                // Handle draw events
+                this.map.on(L.Draw.Event.CREATED, (event) => this.handleDrawEvent(event));
+
                 return true;
             } catch (error) {
                 this.showError('Failed to initialize map.');
                 console.error('Map init error:', error);
                 return false;
             }
+        }
+
+        handleDrawEvent(event) {
+            const type = event.layerType;
+            const layer = event.layer;
+            this.drawLayer.clearLayers();
+            this.drawLayer.addLayer(layer);
+
+            if (this.currentAnalysis === 'buffer') {
+                this.performBufferAnalysis(layer);
+            } else if (this.currentAnalysis === 'spatialQuery') {
+                this.performSpatialQuery(layer);
+            } else if (this.currentAnalysis === 'nearestNeighbor') {
+                this.performNearestNeighbor(layer);
+            }
+        }
+
+        performBufferAnalysis(layer) {
+            const radius = layer instanceof L.Circle ? layer.getRadius() : 1000; // Default 1km if not a circle
+            const center = layer.getLatLng();
+            const buffer = turf.buffer(turf.point([center.lng, center.lat]), radius / 1000, { units: 'kilometers' });
+            const featuresWithin = [];
+
+            this.clusterGroup.eachLayer((marker) => {
+                if (marker.feature) {
+                    const point = turf.point([marker.getLatLng().lng, marker.getLatLng().lat]);
+                    if (turf.booleanPointInPolygon(point, buffer)) {
+                        featuresWithin.push(marker.feature);
+                        marker.setStyle({ fillColor: '#ffff00', fillOpacity: 1 }); // Highlight
+                    } else {
+                        const category = marker.feature.properties?.category || 'publication';
+                        marker.setStyle({ fillColor: this.styles[category]?.color || '#ff7800', fillOpacity: 0.8 });
+                    }
+                }
+            });
+
+            const popupContent = featuresWithin.length > 0
+                ? `<strong>${featuresWithin.length} features within ${radius / 1000} km</strong><br>` +
+                  featuresWithin.map(f => f.properties.title).join('<br>')
+                : 'No features within buffer';
+            layer.bindPopup(popupContent).openPopup();
+        }
+
+        performSpatialQuery(layer) {
+            const polygon = layer.toGeoJSON();
+            const featuresWithin = [];
+
+            this.clusterGroup.eachLayer((marker) => {
+                if (marker.feature) {
+                    const point = turf.point([marker.getLatLng().lng, marker.getLatLng().lat]);
+                    if (turf.booleanPointInPolygon(point, polygon)) {
+                        featuresWithin.push(marker.feature);
+                        marker.setStyle({ fillColor: '#ffff00', fillOpacity: 1 }); // Highlight
+                    } else {
+                        const category = marker.feature.properties?.category || 'publication';
+                        marker.setStyle({ fillColor: this.styles[category]?.color || '#ff7800', fillOpacity: 0.8 });
+                    }
+                }
+            });
+
+            const popupContent = featuresWithin.length > 0
+                ? `<strong>${featuresWithin.length} features within polygon</strong><br>` +
+                  featuresWithin.map(f => f.properties.title).join('<br>')
+                : 'No features within polygon';
+            layer.bindPopup(popupContent).openPopup();
+        }
+
+        performNearestNeighbor(layer) {
+            const clickPoint = turf.point([layer.getLatLng().lng, layer.getLatLng().lat]);
+            let nearestFeature = null;
+            let minDistance = Infinity;
+
+            this.clusterGroup.eachLayer((marker) => {
+                if (marker.feature) {
+                    const point = turf.point([marker.getLatLng().lng, marker.getLatLng().lat]);
+                    const distance = turf.distance(clickPoint, point, { units: 'kilometers' });
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestFeature = marker;
+                    }
+                }
+            });
+
+            if (nearestFeature) {
+                nearestFeature.setStyle({ fillColor: '#ffff00', fillOpacity: 1 });
+                nearestFeature.openPopup();
+                layer.bindPopup(`Nearest: ${nearestFeature.feature.properties.title}<br>Distance: ${minDistance.toFixed(2)} km`).openPopup();
+                setTimeout(() => {
+                    const category = nearestFeature.feature.properties?.category || 'publication';
+                    nearestFeature.setStyle({ fillColor: this.styles[category]?.color || '#ff7800', fillOpacity: 0.8 });
+                }, 5000);
+            }
+        }
+
+        updateHeatmap() {
+            if (!this.isHeatmapActive) return;
+            const points = [];
+            this.clusterGroup.eachLayer((marker) => {
+                if (marker.feature) {
+                    const category = marker.feature.properties?.category || 'publication';
+                    if (this.selectedCategory === 'all' || this.selectedCategory === category) {
+                        points.push([marker.getLatLng().lat, marker.getLatLng().lng, 1]);
+                    }
+                }
+            });
+            this.heatmapLayer.setLatLngs(points);
+            this.heatmapLayer.addTo(this.map);
+        }
+
+        toggleHeatmap() {
+            this.isHeatmapActive = !this.isHeatmapActive;
+            const toggleButton = document.getElementById('toggleHeatmap');
+            toggleButton.innerHTML = `<i class="bi bi-fire"></i> ${this.isHeatmapActive ? 'Hide' : 'Show'} Heatmap`;
+            if (this.isHeatmapActive) {
+                this.map.removeLayer(this.clusterGroup);
+                this.updateHeatmap();
+            } else {
+                this.map.removeLayer(this.heatmapLayer);
+                this.clusterGroup.addTo(this.map);
+            }
+            console.log('Heatmap toggled:', this.isHeatmapActive ? 'on' : 'off');
         }
 
         centerOnUserLocation() {
@@ -177,9 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Cluster group not initialized');
                 return;
             }
-            // Clear existing layers
             this.clusterGroup.clearLayers();
-            // Re-add layers based on selected category
             L.geoJSON(this.geojsonData, {
                 pointToLayer: (feature, latlng) => {
                     const coords = feature.geometry.coordinates;
@@ -202,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     !isNaN(coords[1]);
                     if (!isValid) return false;
                     const category = feature.properties?.category || 'publication';
-                    return this.selectedCategory === 'all' || category === this.selectedCategory;
+                    return this.selectedCategory === 'all' || this.selectedCategory === category;
                 },
                 onEachFeature: (feature, layer) => {
                     const category = feature.properties?.category || 'unknown';
@@ -213,10 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${feature.properties.link ? `<a href="${feature.properties.link}" target="_blank" rel="noopener">Link</a>` : ''}
                         ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
                     `);
+                    layer.feature = feature; // Store feature for spatial analysis
                     this.clusterGroup.addLayer(layer);
                 },
             });
             this.clusterGroup.addTo(this.map);
+            this.updateHeatmap();
             console.log('Layer filtered and added to map');
         }
 
@@ -241,10 +400,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const sidebarContent = document.getElementById('sidebarContent');
             const categoryFilter = document.getElementById('categoryFilter');
             const themeToggle = document.getElementById('themeToggle');
+            const bufferAnalysis = document.getElementById('bufferAnalysis');
+            const spatialQuery = document.getElementById('spatialQuery');
+            const nearestNeighbor = document.getElementById('nearestNeighbor');
+            const toggleHeatmap = document.getElementById('toggleHeatmap');
 
-            if (!toggleSidebar || !sidebarContent || !categoryFilter || !themeToggle) {
+            if (!toggleSidebar || !sidebarContent || !categoryFilter || !themeToggle || !bufferAnalysis || !spatialQuery || !nearestNeighbor || !toggleHeatmap) {
                 this.showError('Failed to initialize controls.');
-                console.error('Missing DOM elements:', { toggleSidebar, sidebarContent, categoryFilter, themeToggle });
+                console.error('Missing DOM elements:', { toggleSidebar, sidebarContent, categoryFilter, themeToggle, bufferAnalysis, spatialQuery, nearestNeighbor, toggleHeatmap });
                 return;
             }
 
@@ -263,6 +426,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
             themeToggle.addEventListener('click', () => {
                 this.toggleTheme();
+            });
+
+            bufferAnalysis.addEventListener('click', () => {
+                this.currentAnalysis = 'buffer';
+                new L.Draw.Circle(this.map, { shapeOptions: { color: '#ff0000' } }).enable();
+                this.showError('Draw a circle to perform buffer analysis');
+            });
+
+            spatialQuery.addEventListener('click', () => {
+                this.currentAnalysis = 'spatialQuery';
+                new L.Draw.Polygon(this.map, { shapeOptions: { color: '#ff0000' } }).enable();
+                this.showError('Draw a polygon to select features');
+            });
+
+            nearestNeighbor.addEventListener('click', () => {
+                this.currentAnalysis = 'nearestNeighbor';
+                new L.Draw.Marker(this.map, { icon: L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png' }) }).enable();
+                this.showError('Place a marker to find the nearest feature');
+            });
+
+            toggleHeatmap.addEventListener('click', () => {
+                this.toggleHeatmap();
             });
         }
 

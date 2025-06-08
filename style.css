@@ -55,7 +55,8 @@ body {
 }
 
 .dark-theme .form-select,
-.dark-theme .btn-outline-secondary {
+.dark-theme .btn-outline-secondary,
+.dark-theme .btn-outline-primary {
     background-color: #343a40;
     color: #fff;
     border-color: #495057;
@@ -73,6 +74,11 @@ body {
 }
 
 .dark-theme .leaflet-control a {
+    color: #fff;
+}
+
+.dark-theme .leaflet-draw-toolbar a {
+    background-color: #343a40;
     color: #fff;
 }
 

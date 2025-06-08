@@ -11,6 +11,8 @@
     <!-- Leaflet MarkerCluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <!-- Custom CSS -->
@@ -37,6 +39,19 @@
             <button id="themeToggle" class="btn btn-outline-secondary w-100 mb-3" aria-label="Toggle theme">
                 <i class="bi bi-moon-stars-fill"></i> Toggle Dark Theme
             </button>
+            <h5 class="mb-3">Spatial Analysis</h5>
+            <button id="bufferAnalysis" class="btn btn-outline-primary w-100 mb-2" aria-label="Buffer analysis">
+                <i class="bi bi-circle"></i> Buffer Analysis
+            </button>
+            <button id="spatialQuery" class="btn btn-outline-primary w-100 mb-2" aria-label="Spatial query">
+                <i class="bi bi-pentagon"></i> Spatial Query
+            </button>
+            <button id="nearestNeighbor" class="btn btn-outline-primary w-100 mb-2" aria-label="Nearest neighbor">
+                <i class="bi bi-geo-alt"></i> Nearest Neighbor
+            </button>
+            <button id="toggleHeatmap" class="btn btn-outline-primary w-100 mb-2" aria-label="Toggle heatmap">
+                <i class="bi bi-fire"></i> Toggle Heatmap
+            </button>
             <h5 class="mb-3">Legend</h5>
             <ul class="list-unstyled legend">
                 <li><span class="dot" style="background: #ff7800;"></span> Publication</li>
@@ -45,7 +60,7 @@
                 <li><span class="dot" style="background: #ff00ff;"></span> Service</li>
                 <li><span class="dot" style="background: #800080;"></span> Waste</li>
                 <li><span class="dot" style="background: #ff0000;"></span> Trending</li>
-            </ul>
+            </\Support
         </div>
     </div>
     <div id="errorMessage" class="alert alert-danger position-fixed top-0 end-0 m-2" style="display: none;" role="alert"></div>
@@ -53,6 +68,12 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
     <!-- Leaflet MarkerCluster JS -->
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <!-- Leaflet Draw JS -->
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <!-- Turf.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.1.0/turf.min.js"></script>
+    <!-- Leaflet Heatmap JS -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <!-- App Script -->
