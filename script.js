@@ -47,12 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'analyst', name: 'Spatial Analyst', points: 5, condition: () => this.spatialAnalyses >= 5 },
                 { id: 'trendsetter', name: 'Trendsetter', points: 15, condition: () => this.bookmarks.filter(b => b.properties.category === 'trending').length >= 3 },
             ];
+            this.weatherApiKey = '5f1eeafde389d2fe727494f286c47b0a'; // Replace with your OpenWeatherMap API key
+            this.websocket = null;
         }
 
         async loadGeoJson() {
             try {
                 const response = await fetch('data/wema.json');
-                if (!response.ok) throw new Error(`Failed to fetch wema.json: ${response.status} ${response.statusText}`);
+                if (!response.ok) throw new Error(`Failed to fetch lomap.json: ${response.status} ${response.statusText}`);
                 this.geojsonData = await response.json();
                 if (!this.geojsonData.features || !Array.isArray(this.geojsonData.features)) {
                     throw new Error('Invalid GeoJSON: features array missing or malformed');
@@ -76,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     maxZoom: 17,
                 });
 
-                // Chunked loading of features
                 this.geojsonData.features.forEach((feature, index) => {
                     setTimeout(() => this.addFeatureToMap(feature), index * 10);
                 });
@@ -93,10 +94,117 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.updateBookmarks();
                 this.updateGamificationUI();
                 this.updateLeaderboard();
+                this.initializeRealTimeUpdates();
             } catch (error) {
                 this.showError('Failed to load map data. Check console for details.');
                 console.error('GeoJSON load error:', error);
             }
+        }
+
+        async fetchWeather(lat, lon) {
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this.weatherApiKey}&units=metric`);
+                if (!response.ok) throw new Error(`Weather API error: ${response.statusText}`);
+                const data = await response.json();
+                return {
+                    temp: data.main.temp,
+                    description: data.weather[0].description,
+                    icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`
+                };
+            } catch (error) {
+                console.error('Weather fetch error:', error);
+                return null;
+            }
+        }
+
+        async updateWeatherDisplay(lat, lon, elementId) {
+            const weather = await this.fetchWeather(lat, lon);
+            const weatherDiv = document.getElementById(elementId);
+            if (weather) {
+                weatherDiv.innerHTML = `
+                    <p><strong>Temperature:</strong> ${weather.temp}°C</p>
+                    <p><strong>Condition:</strong> ${weather.description}</p>
+                    <img src="${weather.icon}" alt="Weather icon" style="width: 50px;">
+                `;
+            } else {
+                weatherDiv.innerHTML = '<p>Unable to fetch weather data.</p>';
+            }
+        }
+
+        initializeRealTimeUpdates() {
+            // Attempt WebSocket connection
+            try {
+                // Replace with your WebSocket server URL, e.g., 'ws://yourserver.com/updates'
+                this.websocket = new WebSocket('wss://echo.websocket.org'); // Mock server for demo
+                document.getElementById('updateStatus').textContent = 'Connected to real-time updates';
+
+                this.websocket.onmessage = (event) => {
+                    try {
+                        const update = JSON.parse(event.data);
+                        if (update.type === 'featureUpdate') {
+                            this.handleFeatureUpdate(update.data);
+                            this.showError('New data received: ' + (update.data.properties?.title || 'Untitled'));
+                        }
+                    } catch (error) {
+                        console.error('WebSocket message error:', error);
+                    }
+                };
+
+                this.websocket.onclose = () => {
+                    document.getElementById('updateStatus').textContent = 'Disconnected. Falling back to polling...';
+                    this.startPolling();
+                };
+
+                this.websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    document.getElementById('updateStatus').textContent = 'WebSocket error. Falling back to polling...';
+                    this.startPolling();
+                };
+            } catch (error) {
+                console.error('WebSocket initialization error:', error);
+                document.getElementById('updateStatus').textContent = 'WebSocket unavailable. Using polling...';
+                this.startPolling();
+            }
+        }
+
+        startPolling() {
+            // Polling fallback: Fetch lomap.json every 30 seconds
+            setInterval(async () => {
+                try {
+                    const response = await fetch('data/wema.json?t=' + new Date().getTime());
+                    if (!response.ok) throw new Error('Polling failed');
+                    const newData = await response.json();
+                    this.handleFeatureUpdate(newData);
+                    document.getElementById('updateStatus').textContent = 'Polled new data';
+                } catch (error) {
+                    console.error('Polling error:', error);
+                    document.getElementById('updateStatus').textContent = 'Polling error';
+                }
+            }, 30000);
+        }
+
+        handleFeatureUpdate(newData) {
+            if (!newData.features || !Array.isArray(newData.features)) return;
+            const newFeatures = newData.features;
+            const existingIds = new Set(this.geojsonData.features.map(f => f.properties.id));
+
+            // Add new features or update existing ones
+            newFeatures.forEach(newFeature => {
+                const index = this.geojsonData.features.findIndex(f => f.properties.id === newFeature.properties.id);
+                if (index === -1) {
+                    this.geojsonData.features.push(newFeature);
+                    this.addFeatureToMap(newFeature);
+                } else {
+                    this.geojsonData.features[index] = newFeature;
+                    this.filterLayer(); // Refresh map to reflect updates
+                }
+            });
+
+            // Remove deleted features
+            this.geojsonData.features = this.geojsonData.features.filter(f => newFeatures.some(nf => nf.properties.id === f.properties.id));
+            this.filterLayer();
+            this.updateHeatmap();
+            this.updateBookmarks();
         }
 
         addFeatureToMap(feature) {
@@ -118,19 +226,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const isBookmarked = this.bookmarks.some(b => b.properties.id === feature.properties.id);
-            marker.bindPopup(`
-                <strong>${feature.properties.title || 'Untitled'}</strong><br>
-                ${feature.properties.description || 'No description'}<br>
-                Category: ${this.styles[category]?.label || 'Unknown'}<br>
-                ${feature.properties.link ? `<a href="${feature.properties.link}" target="_blank" rel="noopener">Link</a>` : ''}
-                ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
-                <br><button class="btn btn-sm btn-primary bookmark-btn" data-id="${feature.properties.id}">${isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}</button>
-                <br><button class="btn btn-sm btn-primary share-btn" data-id="${feature.properties.id}">Share Location</button>
-            `);
-
-            marker.on('popupopen', () => {
+            marker.bindPopup('Loading weather data...'); // Initial placeholder
+            marker.on('popupopen', async () => {
                 this.addPoints(5); // Points for exploring
                 this.checkChallengeProgress(feature);
+                const weather = await this.fetchWeather(correctedLatLng[0], correctedLatLng[1]);
+                const weatherInfo = weather
+                    ? `<br><strong>Weather:</strong> ${weather.temp}°C, ${weather.description}<br><img src="${weather.icon}" alt="Weather icon" style="width: 30px;">`
+                    : '<br>Weather data unavailable';
+                marker.setPopupContent(`
+                    <strong>${feature.properties.title || 'Untitled'}</strong><br>
+                    ${feature.properties.description || 'No description'}<br>
+                    Category: ${this.styles[category]?.label || 'Unknown'}<br>
+                    ${feature.properties.link ? `<a href="${feature.properties.link}" target="_blank" rel="noopener">Link</a>` : ''}
+                    ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
+                    ${weatherInfo}
+                    <br><button class="btn btn-sm btn-primary bookmark-btn" data-id="${feature.properties.id}">${isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}</button>
+                    <br><button class="btn btn-sm btn-primary share-btn" data-id="${feature.properties.id}">Share Location</button>
+                `);
                 document.querySelectorAll('.bookmark-btn').forEach(btn => {
                     btn.addEventListener('click', () => this.toggleBookmark(feature));
                 });
@@ -314,20 +427,23 @@ document.addEventListener('DOMContentLoaded', () => {
         centerOnUserLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (position) => {
+                    async (position) => {
                         const { latitude, longitude } = position.coords;
                         this.map.setView([latitude, longitude], 10);
                         L.marker([latitude, longitude]).addTo(this.map).bindPopup('Your Location').openPopup();
+                        await this.updateWeatherDisplay(latitude, longitude, 'weatherInfo');
                         this.addPoints(10); // Points for locating
                     },
                     (error) => {
                         this.showError('Unable to access location. Using default center.');
                         this.map.setView(this.defaultCenter, this.defaultZoom);
+                        document.getElementById('weatherInfo').innerHTML = '<p>Location access denied.</p>';
                     },
                     { timeout: 10000, enableHighAccuracy: true }
                 );
             } else {
                 this.showError('Geolocation not supported by your browser.');
+                document.getElementById('weatherInfo').innerHTML = '<p>Geolocation not supported.</p>';
             }
         }
 
@@ -348,22 +464,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 },
                 filter: (feature) => this.isFeatureVisible(feature),
-                onEachFeature: (feature, layer) => {
+                onEachFeature: async (feature, layer) => {
                     const category = feature.properties?.category || 'unknown';
+                    const coords = feature.geometry.coordinates;
                     const isBookmarked = this.bookmarks.some(b => b.properties.id === feature.properties.id);
-                    layer.bindPopup(`
-                        <strong>${feature.properties.title || 'Untitled'}</strong><br>
-                        ${feature.properties.description || 'No description'}<br>
-                        Category: ${this.styles[category]?.label || 'Unknown'}<br>
-                        ${feature.properties.link ? `<a href="${feature.properties.link}" target="_blank" rel="noopener">Link</a>` : ''}
-                        ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
-                        <br><button class="btn btn-sm btn-primary bookmark-btn" data-id="${feature.properties.id}">${isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}</button>
-                        <br><button class="btn btn-sm btn-primary share-btn" data-id="${feature.properties.id}">Share Location</button>
-                    `);
-                    layer.feature = feature;
-                    layer.on('popupopen', () => {
+                    layer.bindPopup('Loading weather data...');
+                    layer.on('popupopen', async () => {
                         this.addPoints(5);
                         this.checkChallengeProgress(feature);
+                        const weather = await this.fetchWeather(coords[1], coords[0]);
+                        const weatherInfo = weather
+                            ? `<br><strong>Weather:</strong> ${weather.temp}°C, ${weather.description}<br><img src="${weather.icon}" alt="Weather icon" style="width: 30px;">`
+                            : '<br>Weather data unavailable';
+                        layer.setPopupContent(`
+                            <strong>${feature.properties.title || 'Untitled'}</strong><br>
+                            ${feature.properties.description || 'No description'}<br>
+                            Category: ${this.styles[category]?.label || 'Unknown'}<br>
+                            ${feature.properties.link ? `<a href="${feature.properties.link}" target="_blank" rel="noopener">Link</a>` : ''}
+                            ${feature.properties.date ? `<br>Date: ${feature.properties.date}` : ''}
+                            ${weatherInfo}
+                            <br><button class="btn btn-sm btn-primary bookmark-btn" data-id="${feature.properties.id}">${isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}</button>
+                            <br><button class="btn btn-sm btn-primary share-btn" data-id="${feature.properties.id}">Share Location</button>
+                        `);
                         document.querySelectorAll('.bookmark-btn').forEach(btn => {
                             btn.addEventListener('click', () => this.toggleBookmark(feature));
                         });
@@ -371,6 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             btn.addEventListener('click', () => this.shareLocation(feature));
                         });
                     });
+                    layer.feature = feature;
                     this.clusterGroup.addLayer(layer);
                 },
             });
